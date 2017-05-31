@@ -44,55 +44,55 @@
   (text->word-chain
    (slurp (clojure.java.io/resource fname))))
 
-(def files ["fireflies.txt" "acquainted.txt" "not-taken.txt" "once.txt" "reluctance.txt" "snowy-evening.txt"])
-
+(def files ["quangle-wangle.txt" "monad.txt" "clojure.txt" "functional.txt"
+            "jumblies.txt" "pelican.txt" "pobble.txt"])
 (def functional-leary (apply merge-with clojure.set/union (map process-file files)))
 
 (def prefix-list ["On the" "They went" "And all" "We think"
                   "For every" "No other" "To a" "And every"
                   "We, too," "For his" "And the" "But the"
-                  "Are the" "For the" "When we"
+                  "Are the" "The Pobble" "For the" "When we"
                   "In the" "Yet we" "With only" "Are the"
                   "Though the"  "And when"
                   "We sit" "And this" "No other" "With a"
                   "And at" "What a" "Of the"
-                  "So that" "And all" "When they"
+                  "O please" "So that" "And all" "When they"
                   "But before" "Whoso had" "And nobody" "And it's"
                   "For any" "For example," "Also in" "In contrast"])
 
 
 (defn end-at-last-punctuation [text]
-    (let [trimmed-to-last-punct (apply str (re-seq #"[\s\w]+[^.!?,]*[.!?,]" text))
-          trimmed-to-last-word (apply str (re-seq #".*[^a-zA-Z]+" text))
-          result-text (if (empty? trimmed-to-last-punct)
-                        trimmed-to-last-word
-                        trimmed-to-last-punct)
-          cleaned-text (clojure.string/replace result-text #"[,| ]$" ".")]
-      (clojure.string/replace cleaned-text #"\"" "'")))
+  (let [trimmed-to-last-punct (apply str (re-seq #"[\s\w]+[^.!?,]*[.!?,]" text))
+        trimmed-to-last-word (apply str (re-seq #".*[^a-zA-Z]+" text))
+        result-text (if (empty? trimmed-to-last-punct)
+                      trimmed-to-last-word
+                      trimmed-to-last-punct)
+        cleaned-text (clojure.string/replace result-text #"[,| ]$" ".")]
+    (clojure.string/replace cleaned-text #"\"" "'")))
 
 (defn tweet-text []
-    (let [text (generate-text (-> prefix-list shuffle first) functional-leary)]
-      (end-at-last-punctuation text)))
+  (let [text (generate-text (-> prefix-list shuffle first) functional-leary)]
+    (end-at-last-punctuation text)))
 
 
-(def my-creds (twitter-oauth/make-oauth-creds   (env :app-consumer-key)
-                                                (env :app-consumer-secret)
-                                                (env :user-access-token)
-                                                (env :user-access-secret)))
+(def my-creds (twitter-oauth/make-oauth-creds (env :app-consumer-key)
+                                              (env :app-consumer-secret)
+                                              (env :user-access-token)
+                                              (env :user-access-secret)))
 
 (defn status-update []
-    (let [tweet (tweet-text)]
-      (println "generated tweet is :" tweet)
-      (println "char count is:" (count tweet))
-      (when (not-empty tweet)
-        (try (twitter/statuses-update :oauth-creds my-creds
-                                      :params {:status tweet})
-             (catch Exception e (println "Oh no! " (.getMessage e)))))))
+  (let [tweet (tweet-text)]
+    (println "generated tweet is :" tweet)
+    (println "char count is:" (count tweet))
+    (when (not-empty tweet)
+      (try (twitter/statuses-update :oauth-creds my-creds
+                                    :params {:status tweet})
+           (catch Exception e (println "Oh no! " (.getMessage e)))))))
 
 (def my-pool (overtone/mk-pool))
 
 (defn -main [& args]
-    ;; every 8 hours
-    (println "Started up")
-    (println (tweet-text))
-    (overtone/every (* 1000 60) #(println (status-update)) my-pool))
+  ;; every 8 hours
+  (println "Started up")
+  (println (tweet-text))
+  (overtone/every (* 1000 60 60 8) #(println (status-update)) my-pool))
