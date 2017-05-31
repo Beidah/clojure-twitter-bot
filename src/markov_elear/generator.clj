@@ -45,7 +45,8 @@
    (slurp (clojure.java.io/resource fname))))
 
 (def files ["quangle-wangle.txt" "monad.txt" "clojure.txt" "functional.txt"
-            "jumblies.txt" "pelican.txt" "pobble.txt"])
+            "jumblies.txt" "pelican.txt" "pobble.txt" "fireflies.txt"
+            "not-taken.txt" "reluctance.txt" "snowy-evening.txt" "once.txt" "acquainted.txt"])
 (def functional-leary (apply merge-with clojure.set/union (map process-file files)))
 
 (def prefix-list ["On the" "They went" "And all" "We think"
@@ -53,12 +54,16 @@
                   "We, too," "For his" "And the" "But the"
                   "Are the" "The Pobble" "For the" "When we"
                   "In the" "Yet we" "With only" "Are the"
-                  "Though the"  "And when"
+                  "Though the"  "And when" "Two roads"
                   "We sit" "And this" "No other" "With a"
-                  "And at" "What a" "Of the"
+                  "And at" "What a" "Of the" "To where"
                   "O please" "So that" "And all" "When they"
                   "But before" "Whoso had" "And nobody" "And it's"
-                  "For any" "For example," "Also in" "In contrast"])
+                  "For any" "For example," "Also in" "In contrast"
+                  "And both" "I shall" "I took" "And took"
+                  "Whose woods" "The darkest" "The woods" "The darkest"
+                  "The only" "To stop" "The leaves" "Out through"
+                  "The last" "The heart" "To go"])
 
 
 (defn end-at-last-punctuation [text]
@@ -95,4 +100,4 @@
   ;; every 8 hours
   (println "Started up")
   (println (tweet-text))
-  (overtone/every (* 1000 60 60 8) #(println (status-update)) my-pool))
+  (overtone/every (* 1000 60 10) #(println (status-update)) my-pool))
